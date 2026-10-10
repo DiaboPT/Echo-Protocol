@@ -1,0 +1,36 @@
+Layers do Player e Inimigo
+Navmesh (com layers de player e INimigos removidas)
+Mavmesh Modifier nos IObjetos (para os remover da MavMesh)
+
+Alterei função guard para andar pelos walkpoints por ordem
+
+
+LineRenderer para mostrar os trajetos
+
+Apagar  o Nav Mesh Agent do EnemyDrone para usar a função VoarPara()
+
+inimigos a seguir até mais perto
+
+
+comentei shootingRadius das funções PursuePlayer  e enemyHitDamage no Enemy.cs e EnemyDrone.cs 
+para os inimigos se aproximarem mais 
+
+Função Dispara() invocada por PursuePlayer() e ShootPlayer()
+A ideia é disparar apartir do momento que vê e perseguir a disparar enão só quando chega perto
+
+
+implementei a posição e rotação inicial para não ter de usar walkpoints nestes inimigos fixos
+
+reiniciar vision e shooting radius quando inimigos quando perde o contacto com o player
+
+
+
+okay não vou implementar essa melhorias agora. quero apenas que só saio "bala" no momento clique e não saiam inifinitas balas enquanto tenho a tecla carregada
+
+
+Desenhar raio de deteção de cada inimigo
+
+implementar zonas de deteção para os inimigos me detetarem quando entro em certos sitios (Zonas de Alerta)
+
+Alterar material dos inimigos mortos
+

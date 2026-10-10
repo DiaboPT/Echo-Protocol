@@ -1,0 +1,71 @@
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+// HUD provisório + teclas de teste. Pôr no jogador (junto dos outros scripts).
+// K = tiro de soldado (10 dano) · L = laser do drone (10 dano + 20 energia) · H = curar 30
+public class DebugHUD : MonoBehaviour
+{
+    PlayerStats stats;
+    SuitAbilities abilities;
+    PlayerMovement movement;
+
+    void Awake()
+    {
+        stats = GetComponent<PlayerStats>();
+        abilities = GetComponent<SuitAbilities>();
+        movement = GetComponent<PlayerMovement>();
+    }
+
+    void Update()
+    {
+        Keyboard kb = Keyboard.current;
+        if (kb == null || stats == null) return;
+
+        if (kb.kKey.wasPressedThisFrame) stats.TakeDamage(10f);
+        if (kb.lKey.wasPressedThisFrame)
+        {
+            stats.TakeDamage(10f);
+            stats.DrainEnergy(20f);
+        }
+        if (kb.hKey.wasPressedThisFrame) stats.Heal(30f);
+    }
+
+    void OnGUI()
+    {
+        if (stats == null) return;
+        
+        DrawBar(20, stats.health / stats.maxHealth, new Color(0.9f, 0.2f, 0.2f), "VIDA HUMANA: " + stats.health.ToString("0"));
+        DrawBar(48, stats.energy / stats.maxEnergy, new Color(0.2f, 0.6f, 1f), "FATO: " + stats.energy.ToString("0"));
+
+        if (abilities != null && movement != null)
+        {
+            GUI.Label(new Rect(20, 76, 400, 20), "[1] Salto " + OnOff(abilities.jumpActive) + "  (altura " + movement.GetJumpHeight() + " m)");
+            GUI.Label(new Rect(20, 94, 400, 20), "[2] Blindagem " + OnOff(abilities.armorActive));
+            GUI.Label(new Rect(20, 112, 400, 20), "[3] Precisão " + OnOff(abilities.precisionActive) + "  · gasto " + abilities.GetDrainPerSecond().ToString("0") + "/s");
+        }
+
+        GUI.Label(new Rect(20, 136, 400, 20), "Teste: K dano · L laser drone · H curar");
+
+        if (stats.isDead)
+            GUI.Label(new Rect(Screen.width / 2 - 60, Screen.height / 2, 200, 30), "SINAL PERDIDO");
+    }
+
+    string OnOff(bool active)
+    {
+        if (active) return "LIGADO";
+        return "-";
+    }
+
+    // Barra: fundo preto + parte colorida proporcional ao valor (fill entre 0 e 1)
+    void DrawBar(float y, float fill, Color color, string label)
+    {
+        GUI.color = Color.black;
+        GUI.DrawTexture(new Rect(20, y, 250, 22), Texture2D.whiteTexture);
+
+        GUI.color = color;
+        GUI.DrawTexture(new Rect(22, y + 2, 246 * Mathf.Clamp01(fill), 18), Texture2D.whiteTexture);
+
+        GUI.color = Color.white;
+        GUI.Label(new Rect(26, y + 2, 250, 22), label);
+    }
+}
