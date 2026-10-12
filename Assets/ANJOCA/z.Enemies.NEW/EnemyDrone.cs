@@ -59,6 +59,13 @@ public class EnemyDrone : MonoBehaviour
    
    // material que o inimigo passa a usar quando morre
    public Material materialMorto;
+   
+   // quão depressa roda enquanto cai
+   public float giroQueda = 5f;
+   
+   // linha do tiro, igual à do Player
+   public LineRenderer linhaTiro;
+   public float duracaoLinha = 0.1f;
 
    private void Awake()
    {
@@ -72,6 +79,9 @@ public class EnemyDrone : MonoBehaviour
       
       visionRadiusInicial = visionRadius;
       shootingRadiusInicial = shootingRadius;
+      
+      // a linha começa escondida
+      if (linhaTiro != null) linhaTiro.enabled = false;
    }
 
    private void Update()
@@ -195,17 +205,36 @@ public class EnemyDrone : MonoBehaviour
 
       Vector3 origem = ShootingRaycastArea.transform.position;
       Vector3 direcao = (LookPoint.position - origem).normalized;
+      
+      // se não acertar em nada, a linha vai até ao alcance máximo
+      Vector3 fim = origem + direcao * visionRadius;
 
       RaycastHit hit;
       if (Physics.Raycast(origem, direcao, out hit, visionRadius))
       {
-         Debug.Log("Shooting " + hit.transform.name);
+         // Debug.Log("Shooting " + hit.transform.name);
+         fim = hit.point;
          PlayerStats alvo = hit.transform.GetComponent<PlayerStats>();
          if (alvo != null) alvo.playerHitDamage(giveDamage);
+      }
+      
+      
+      // mostra a linha da ponta da arma até onde o tiro acabou
+      if (linhaTiro != null)
+      {
+         linhaTiro.enabled = true;
+         linhaTiro.SetPosition(0, origem);
+         linhaTiro.SetPosition(1, fim);
+         Invoke(nameof(EsconderLinha), duracaoLinha);
       }
 
       previouslyShoot = true;
       Invoke(nameof(ActiveShooting), timeBetweenShoot);
+   }
+   
+   private void EsconderLinha()
+   {
+      linhaTiro.enabled = false;
    }
    
    private void ShootPlayer()
@@ -256,6 +285,9 @@ public class EnemyDrone : MonoBehaviour
 
    public void enemyDroneHitDamage(float takeDamage)
    {
+      // já está morto: ignora os tiros seguintes
+      if (presentHealth <= 0) return;
+      
       presentHealth -= takeDamage;
       // healthBar.SetHealth(presentHealth);
       
@@ -298,6 +330,16 @@ public class EnemyDrone : MonoBehaviour
             malha.sharedMaterials = mats;
          }
       }
+      // enquanto voa é trigger e atravessa tudo; ao morrer passa a sólido para bater no chão
+      GetComponent<Collider>().isTrigger = false;
+      // liga a física para a gravidade o puxar para o chão
+      Rigidbody rb = GetComponent<Rigidbody>();
+      if (rb == null) rb = gameObject.AddComponent<Rigidbody>();
+      rb.isKinematic = false;
+      rb.useGravity = true;
+
+// põe-no a rodar numa direção ao acaso, para cair aos rebolões
+      rb.angularVelocity = UnityEngine.Random.insideUnitSphere * giroQueda;
       
       Object.Destroy(gameObject, 5.0f);
    }

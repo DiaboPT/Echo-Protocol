@@ -89,6 +89,9 @@ public class PlayerStats : MonoBehaviour
 
         if (health <= 0)
         {
+            // tomba o player
+            GetComponent<PlayerQueda>().Morrer();
+            
             PlayerDie();
         }
     }

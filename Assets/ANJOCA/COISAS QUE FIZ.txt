@@ -34,3 +34,18 @@ implementar zonas de deteção para os inimigos me detetarem quando entro em cer
 
 Alterar material dos inimigos mortos
 
+vida do lider a 400. outros a 100
+
+adicionado armas aos inimigos e raios para perceber os tiros dos mesmo
+
+portas que só abrem com chave
+
+pequena animação das portas a abrir
+
+pequena animação de soldado a morrer -> função Cair()
+
+pequena animação de drone a morrer -> liga fisica
+
+pequena animação do player a cair quando morre
+
+ativada a auto-destruição

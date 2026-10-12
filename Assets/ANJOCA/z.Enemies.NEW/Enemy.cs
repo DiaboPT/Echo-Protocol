@@ -1,10 +1,11 @@
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
    [Header("Enemy Health and Damage")] 
-   private float enemyHealth = 120f;
+   public float enemyHealth = 100f;
    public float presentHealth;
    public float giveDamage = 5f;
    // public HealthBar healthBar;
@@ -55,6 +56,13 @@ public class Enemy : MonoBehaviour
    // material que o inimigo passa a usar quando morre
    public Material materialMorto;
    
+   // quanto tempo demora a cair (segundos)
+   public float duracaoQueda = 0.2f;
+   
+   // linha do tiro, igual à do Player
+   public LineRenderer linhaTiro;
+   public float duracaoLinha = 0.1f;
+   
    private void Awake()
    {
       // audioSource =  GetComponent<AudioSource>();
@@ -68,6 +76,9 @@ public class Enemy : MonoBehaviour
       
       visionRadiusInicial = visionRadius;
       shootingRadiusInicial = shootingRadius;
+      
+      // a linha começa escondida
+      if (linhaTiro != null) linhaTiro.enabled = false;
    }
 
    private void Update()
@@ -198,17 +209,34 @@ public class Enemy : MonoBehaviour
 
       Vector3 origem = ShootingRaycastArea.transform.position;
       Vector3 direcao = (LookPoint.position - origem).normalized;
+      
+      // se não acertar em nada, a linha vai até ao alcance máximo
+      Vector3 fim = origem + direcao * visionRadius;
 
       RaycastHit hit;
       if (Physics.Raycast(origem, direcao, out hit, visionRadius))
       {
-         Debug.Log("Shooting " + hit.transform.name);
+         // Debug.Log("Shooting " + hit.transform.name);
+         fim = hit.point;
          PlayerStats alvo = hit.transform.GetComponent<PlayerStats>();
          if (alvo != null) alvo.playerHitDamage(giveDamage);
+      }
+      // mostra a linha da ponta da arma até onde o tiro acabou
+      if (linhaTiro != null)
+      {
+         linhaTiro.enabled = true;
+         linhaTiro.SetPosition(0, origem);
+         linhaTiro.SetPosition(1, fim);
+         Invoke(nameof(EsconderLinha), duracaoLinha);
       }
 
       previouslyShoot = true;
       Invoke(nameof(ActiveShooting), timeBetweenShoot);
+   }
+   
+   private void EsconderLinha()
+   {
+      linhaTiro.enabled = false;
    }
    
    private void ShootPlayer()
@@ -278,7 +306,13 @@ public class Enemy : MonoBehaviour
 
    private void enemyDie()
    {
-      enemyAgent.SetDestination(transform.position);
+      // enemyAgent.SetDestination(transform.position);
+      
+      // desliga o NavMesh Agent, senão ele mantém o soldado de pé
+      enemyAgent.enabled = false;
+      // tomba o soldado
+      StartCoroutine(Cair());
+      
       enemySpeed = 0f;
       shootingRadius = 0f;
       visionRadius = 0f;
@@ -301,6 +335,26 @@ public class Enemy : MonoBehaviour
       }
       
       Object.Destroy(gameObject, 5.0f);
+   }
+   
+   // tomba o soldado para trás e assenta-o no chão
+   private IEnumerator Cair()
+   {
+      Quaternion rotInicio = transform.rotation;
+      Quaternion rotFim = rotInicio * Quaternion.Euler(-90f, 0f, 0f); // deitado de costas
+      Vector3 posInicio = transform.position;
+      Vector3 posFim = posInicio + Vector3.down * 0.5f; // desce meia cápsula
+
+      float tempo = 0f;
+      while (tempo < duracaoQueda)
+      {
+         tempo += Time.deltaTime;
+         float t = tempo / duracaoQueda;
+         t = t * t; // começa devagar e acelera, como uma queda
+         transform.rotation = Quaternion.Slerp(rotInicio, rotFim, t);
+         transform.position = Vector3.Lerp(posInicio, posFim, t);
+         yield return null; // espera pelo frame seguinte
+      }
    }
    
    // desenha os raios na Scene quando o inimigo está selecionado
