@@ -49,3 +49,22 @@ pequena animação de drone a morrer -> liga fisica
 pequena animação do player a cair quando morre
 
 ativada a auto-destruição
+
+
+V 0.3
+------------------------------
+correção das funções 	TakeDamage	e playerHitDamage
+-> DEBUG usava uma e inimigos ao atingir usava outr. armadura não funcionava
+
+Reposicionamento do Abrigo e da posição inicial do player
+
+adicionar limites
+
+corrigir morte sem ativação de auto-destruição (em vez de mostrar um GUI.Label mostra em TextMeshPro)
+-> alteração em DebugHUD.cs
+
+Modo Teste
+-> Possibilidade de ativar/ desativar coisas alterar parâmetros quando se liga ou desliga o modo de teste
+
+corrigido tiro pelas portas
+

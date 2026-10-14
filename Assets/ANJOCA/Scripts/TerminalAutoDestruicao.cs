@@ -1,6 +1,4 @@
 using UnityEngine;
-
-using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 
@@ -16,19 +14,22 @@ public class TerminalAutodestruicao : MonoBehaviour
     public float tempoContagem = 60f;         // segundos até explodir
     public float raioExplosao = 40f;          // metros destruídos à volta do terminal
     public LayerMask camadasDestruir = ~0;    // o que pode ser destruído (tira o Ground)
-    //public GameObject efeitoExplosao;         // opcional: prefab de partículas
-    //public AudioClip somExplosao;             // opcional: som da explosão
+    public GameObject efeitoExplosao;         // opcional: prefab de partículas
+    public AudioClip somExplosao;             // opcional: som da explosão
 
-    [Header("HUD (opcional)")]
+    [Header("HUD")]
     public TextMeshProUGUI textoTimer;        // texto no Canvas para o aviso e a contagem
+    public TextMeshProUGUI textoResultado;    // texto grande no meio do ecrã: ganhaste / perdeste
 
     InventarioPlayer inventario;              // o do jogador, só enquanto está dentro da zona
     bool ativado = false;
+    bool terminado = false;                   // passa a verdadeiro quando já se ganhou ou perdeu
     float tempoRestante;
 
     void Start()
     {
         if (textoTimer != null) textoTimer.text = "";
+        if (textoResultado != null) textoResultado.text = "";
     }
 
     void Update()
@@ -95,43 +96,69 @@ public class TerminalAutodestruicao : MonoBehaviour
         tempoRestante -= Time.deltaTime;
 
         if (textoTimer != null)
-            textoTimer.text = "Autodestruição: " + Mathf.CeilToInt(Mathf.Max(tempoRestante, 0f)) + " s";
+        {
+            int segundos = Mathf.CeilToInt(Mathf.Max(tempoRestante, 0f));
+            textoTimer.text = "Autodestruição: " + segundos + " s\nFuja para o abrigo!";
+        }
 
         if (tempoRestante <= 0f)
             Explodir();
     }
 
+    // chamado pelo PlayerStats quando o jogador morre
+    public void JogadorMorreu()
+    {
+        if (!ativado || terminado) return;   // só conta durante a contagem
+
+        terminado = true;
+        enabled = false;                     // desliga o Update: a contagem pára
+        if (textoTimer != null) textoTimer.text = "";
+        MostrarResultado("SINAL PERDIDO\nPerdeste");
+    }
+
+    void MostrarResultado(string mensagem)
+    {
+        Debug.Log(mensagem);
+        if (textoResultado != null) textoResultado.text = mensagem;
+        BloquearCursor.FimDeJogo();   //soltar o rato
+    }
+
     void Explodir()
     {
+        terminado = true;  // a morte pela explosão já não passa pelo JogadorMorreu
         enabled = false;   // desliga o Update: a explosão só acontece uma vez
         if (textoTimer != null) textoTimer.text = "";
 
-        //if (efeitoExplosao != null)
-        //    Instantiate(efeitoExplosao, transform.position, Quaternion.identity);
-        //if (somExplosao != null)
-         //   AudioSource.PlayClipAtPoint(somExplosao, transform.position);
+        if (efeitoExplosao != null)
+            Instantiate(efeitoExplosao, transform.position, Quaternion.identity);
+        if (somExplosao != null)
+            AudioSource.PlayClipAtPoint(somExplosao, transform.position);
 
-         // o jogador está dentro do raio? (por distância, não depende das Camadas Destruir)
-         PlayerStats statsJogador = FindFirstObjectByType<PlayerStats>();
-         bool jogadorApanhado = statsJogador != null &&
-                                Vector3.Distance(statsJogador.transform.position, transform.position) <= raioExplosao;
+        // o jogador está dentro do raio? (por distância, não depende das Camadas Destruir)
+        PlayerStats statsJogador = FindFirstObjectByType<PlayerStats>();
+        bool jogadorApanhado = statsJogador != null &&
+            Vector3.Distance(statsJogador.transform.position, transform.position) <= raioExplosao;
 
-         Collider[] atingidos = Physics.OverlapSphere(transform.position, raioExplosao, camadasDestruir);
-         foreach (Collider c in atingidos)
-         {
-             if (c.GetComponentInParent<InventarioPlayer>() != null) continue;  // o Player não é destruído
-             Destroy(c.gameObject);
-         }
+        // apanha todos os colliders dentro da esfera, só nas camadas escolhidas
+        Collider[] atingidos = Physics.OverlapSphere(transform.position, raioExplosao, camadasDestruir);
 
-         if (jogadorApanhado)
-         {
-             Debug.Log("Sinal perdido: o jogador estava dentro do raio da explosão");
-             statsJogador.playerHitDamage(9999f);   // tira-lhe a vida toda
-         }
-         else
-         {
-             Debug.Log("Base destruída e o jogador escapou");
-         }
+        foreach (Collider c in atingidos)
+        {
+            // o Player não é destruído (levava a câmara com ele)
+            if (c.GetComponentInParent<InventarioPlayer>() != null) continue;
+
+            Destroy(c.gameObject);
+        }
+
+        if (jogadorApanhado)
+        {
+            statsJogador.TakeDamage(9999f);   // tira-lhe a vida toda
+            MostrarResultado("SINAL PERDIDO\nPerdeste");
+        }
+        else
+        {
+            MostrarResultado("MISSÃO CUMPRIDA\nGanhaste");
+        }
 
         Destroy(gameObject);   // a zona e o terminal (filho)
     }

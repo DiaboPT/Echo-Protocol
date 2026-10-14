@@ -215,7 +215,7 @@ public class EnemyDrone : MonoBehaviour
          // Debug.Log("Shooting " + hit.transform.name);
          fim = hit.point;
          PlayerStats alvo = hit.transform.GetComponent<PlayerStats>();
-         if (alvo != null) alvo.playerHitDamage(giveDamage);
+         if (alvo != null) alvo.TakeDamage(giveDamage);
       }
       
       
@@ -262,7 +262,7 @@ public class EnemyDrone : MonoBehaviour
 
             if (playerBody != null)
             {
-               playerBody.playerHitDamage(giveDamage);
+               playerBody.TakeDamage(giveDamage);
             }
             
             // anim.SetBool("Shoot", true);

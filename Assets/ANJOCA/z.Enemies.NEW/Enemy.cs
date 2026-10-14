@@ -219,7 +219,7 @@ public class Enemy : MonoBehaviour
          // Debug.Log("Shooting " + hit.transform.name);
          fim = hit.point;
          PlayerStats alvo = hit.transform.GetComponent<PlayerStats>();
-         if (alvo != null) alvo.playerHitDamage(giveDamage);
+         if (alvo != null) alvo.TakeDamage(giveDamage);
       }
       // mostra a linha da ponta da arma até onde o tiro acabou
       if (linhaTiro != null)
@@ -262,7 +262,7 @@ public class Enemy : MonoBehaviour
 
             if (playerBody != null)
             {
-               playerBody.playerHitDamage(giveDamage);
+               playerBody.TakeDamage(giveDamage);
             }
             
             // anim.SetBool("Shoot", true);

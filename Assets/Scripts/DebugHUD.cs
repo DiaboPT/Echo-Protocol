@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 // HUD provisório + teclas de teste. Pôr no jogador (junto dos outros scripts).
 // K = tiro de soldado (10 dano) · L = laser do drone (10 dano + 20 energia) · H = curar 30
@@ -8,6 +9,9 @@ public class DebugHUD : MonoBehaviour
     PlayerStats stats;
     SuitAbilities abilities;
     PlayerMovement movement;
+    
+    public TextMeshProUGUI textoResultado;   // o TextoResultado do Canvas
+    bool mostrouDerrota = false;             // para escrever só uma vez
 
     void Awake()
     {
@@ -18,9 +22,18 @@ public class DebugHUD : MonoBehaviour
 
     void Update()
     {
+        // morreu: escreve a derrota no TextoResultado (uma só vez)
+        if (stats != null && stats.isDead && !mostrouDerrota && textoResultado != null)
+        {
+            mostrouDerrota = true;
+            if (!textoResultado.text.StartsWith("MISSÃO"))   // não apaga uma vitória já mostrada
+                textoResultado.text = "SINAL PERDIDO\nPerdeste";
+        }
+        
         Keyboard kb = Keyboard.current;
         if (kb == null || stats == null) return;
-
+        
+        if (!ModoTeste.Ativo) return;   // fora do modo teste, as teclas não fazem nada
         if (kb.kKey.wasPressedThisFrame) stats.TakeDamage(10f);
         if (kb.lKey.wasPressedThisFrame)
         {
@@ -43,11 +56,11 @@ public class DebugHUD : MonoBehaviour
             GUI.Label(new Rect(20, 94, 400, 20), "[2] Blindagem " + OnOff(abilities.armorActive));
             GUI.Label(new Rect(20, 112, 400, 20), "[3] Precisão " + OnOff(abilities.precisionActive) + "  · gasto " + abilities.GetDrainPerSecond().ToString("0") + "/s");
         }
+        if (ModoTeste.Ativo)
+            GUI.Label(new Rect(20, 136, 400, 20), "Teste: K dano · L laser drone · H curar");
 
-        GUI.Label(new Rect(20, 136, 400, 20), "Teste: K dano · L laser drone · H curar");
-
-        if (stats.isDead)
-            GUI.Label(new Rect(Screen.width / 2 - 60, Screen.height / 2, 200, 30), "SINAL PERDIDO");
+        // if (stats.isDead)
+        //     GUI.Label(new Rect(Screen.width / 2 - 60, Screen.height / 2, 200, 30), "SINAL PERDIDO");
     }
 
     string OnOff(bool active)

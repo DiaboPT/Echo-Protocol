@@ -40,7 +40,7 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-    // ---------- Vida ----------
+    // ---------- Função corrigida para tirar vida
     public void TakeDamage(float amount)
     {
         if (isDead) return;
@@ -56,6 +56,12 @@ public class PlayerStats : MonoBehaviour
             health = 0f;
             isDead = true;
             Debug.Log("Sinal perdido");
+
+            // tomba o player
+            PlayerQueda queda = GetComponent<PlayerQueda>();
+            if (queda != null) queda.Morrer();
+
+            PlayerDie();
         }
     }
 
@@ -81,23 +87,27 @@ public class PlayerStats : MonoBehaviour
     
     
     
-    public void playerHitDamage(float takeDamage)
-    {
-        health -= takeDamage;
-        // healthBar.SetHealth(presentHealth);
-        //  audioSource.PlayOneShot(playerHurtSound);
-
-        if (health <= 0)
-        {
-            // tomba o player
-            GetComponent<PlayerQueda>().Morrer();
-            
-            PlayerDie();
-        }
-    }
+    // public void playerHitDamage(float takeDamage)
+    // {
+    //     health -= takeDamage;
+    //     // healthBar.SetHealth(presentHealth);
+    //     //  audioSource.PlayOneShot(playerHurtSound);
+    //
+    //     if (health <= 0)
+    //     {
+    //         // tomba o player
+    //         GetComponent<PlayerQueda>().Morrer();
+    //         
+    //         PlayerDie();
+    //     }
+    // }
     
     private void PlayerDie()
     {
+        // avisa o terminal de autodestruição: se a contagem estiver a correr, pára e mostra a derrota
+        TerminalAutodestruicao terminal = FindFirstObjectByType<TerminalAutodestruicao>();
+        if (terminal != null) terminal.JogadorMorreu();
+        
         // EndGameMenuUI.SetActive(true);
         Cursor.lockState = CursorLockMode.None;
         // deathCamera.SetActive(true);
