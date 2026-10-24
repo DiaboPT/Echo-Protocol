@@ -24,9 +24,21 @@ public class ModoTeste : MonoBehaviour
     public float vidaMaximaNormal = 100f;
     public float vidaMaximaTeste = 1000f;
 
+    [Header("Aprimoramentos do Fato")]
+    [Tooltip("Pode ficar vazio: se o SuitAbilities estiver no Player, é encontrado sozinho.")]
+    public SuitAbilities aprimoramentos;
+    [Tooltip("Em teste, os módulos de Salto, Blindagem e Precisão ficam todos desbloqueados.")]
+    public bool desbloquearTudoEmTeste = true;
+
     [Header("Energia máxima do Fato (normal / teste)")]
     public float energiaMaximaNormal = 100f;
     public float energiaMaximaTeste = 1000f;
+
+    [Header("Dano de cada bala nos inimigos (normal / teste)")]
+    [Tooltip("Pode ficar vazio: se o Weapon estiver no Player ou num filho dele, é encontrado sozinho.")]
+    public Weapon arma;
+    public float danoNormal = 20f;
+    public float danoTeste = 100f;
 
     [Header("Autodestruição (normal / teste)")]
     public TerminalAutodestruicao terminal;
@@ -48,6 +60,10 @@ public class ModoTeste : MonoBehaviour
     public static bool Ativo { get; private set; }
 
     bool modoAplicado;
+
+    // O que o jogador já tinha apanhado antes de entrar em teste (para repor no modo normal)
+    bool tinhaSalto, tinhaBlindagem, tinhaPrecisao;
+    bool desbloqueioAplicado;
 
     void Awake()
     {
@@ -88,6 +104,13 @@ public class ModoTeste : MonoBehaviour
             jogador.energy = modoTeste ? jogador.maxEnergy : Mathf.Min(jogador.energy, jogador.maxEnergy);
         }
 
+        AplicarAprimoramentos();
+
+        if (arma == null && jogador != null)
+            arma = jogador.GetComponentInChildren<Weapon>(true);
+        if (arma != null)
+            arma.damage = modoTeste ? danoTeste : danoNormal;
+
         if (terminal != null)
         {
             terminal.tempoContagem = modoTeste ? tempoContagemTeste : tempoContagemNormal;
@@ -104,5 +127,40 @@ public class ModoTeste : MonoBehaviour
             if (r != null) r.enabled = modoTeste;
 
         Debug.Log(modoTeste ? "MODO TESTE ligado" : "Modo normal");
+    }
+
+    void AplicarAprimoramentos()
+    {
+        if (aprimoramentos == null && jogador != null)
+            aprimoramentos = jogador.GetComponent<SuitAbilities>();
+        if (aprimoramentos == null) return;
+
+        bool desbloquear = modoTeste && desbloquearTudoEmTeste;
+
+        if (desbloquear && !desbloqueioAplicado)
+        {
+            // Guarda o que já estava apanhado e desbloqueia tudo
+            tinhaSalto = aprimoramentos.jumpUnlocked;
+            tinhaBlindagem = aprimoramentos.armorUnlocked;
+            tinhaPrecisao = aprimoramentos.precisionUnlocked;
+
+            aprimoramentos.jumpUnlocked = true;
+            aprimoramentos.armorUnlocked = true;
+            aprimoramentos.precisionUnlocked = true;
+            desbloqueioAplicado = true;
+        }
+        else if (!desbloquear && desbloqueioAplicado)
+        {
+            // Volta ao normal: só fica desbloqueado o que tinha sido apanhado
+            aprimoramentos.jumpUnlocked = tinhaSalto;
+            aprimoramentos.armorUnlocked = tinhaBlindagem;
+            aprimoramentos.precisionUnlocked = tinhaPrecisao;
+
+            // Desliga os que ficaram bloqueados mas estavam ligados
+            if (!tinhaSalto) aprimoramentos.jumpActive = false;
+            if (!tinhaBlindagem) aprimoramentos.armorActive = false;
+            if (!tinhaPrecisao) aprimoramentos.precisionActive = false;
+            desbloqueioAplicado = false;
+        }
     }
 }

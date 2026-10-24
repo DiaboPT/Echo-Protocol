@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - Head
   layers:
   - Default
   - TransparentFX
@@ -14,9 +15,9 @@ TagManager:
   - Player
   - Enemy
   - Ground
-  - 
-  - 
-  - 
+  - Minimapa
+  - Telhado
+  - VolumeMinimapa
   - 
   - 
   - 

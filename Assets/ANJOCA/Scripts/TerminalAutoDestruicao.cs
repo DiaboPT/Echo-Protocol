@@ -25,6 +25,8 @@ public class TerminalAutodestruicao : MonoBehaviour
     bool ativado = false;
     bool terminado = false;                   // passa a verdadeiro quando já se ganhou ou perdeu
     float tempoRestante;
+    
+    public bool Ativado => ativado;   // o minimapa lê isto para saber se a contagem já começou
 
     void Start()
     {
