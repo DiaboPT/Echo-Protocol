@@ -4,6 +4,8 @@ using System.Collections;
 
 public class Enemy : MonoBehaviour
 {
+   private DetectionBasic detectionManager;
+
    [Header("Enemy Health and Damage")] 
    public float enemyHealth = 100f;
    public float presentHealth;
@@ -180,6 +182,8 @@ public class Enemy : MonoBehaviour
          maoEsquerda = anim.GetBoneTransform(HumanBodyBones.LeftHand);
          rotacaoModeloInicial = anim.transform.localRotation;
       }
+
+        detectionManager = transform.parent.GetComponent<DetectionBasic>();
    }
 
    private void Update()
@@ -191,7 +195,7 @@ public class Enemy : MonoBehaviour
       playerInShootingRadius = Physics.CheckSphere(transform.position, shootingRadius, playerLayer);
 
       // acabou de te ver (no frame anterior não via): voz de alerta
-      if (playerInVisionRadius && !viaJogador && Time.time >= proximoAlerta)
+      if (playerInVisionRadius && !viaJogador && Time.time >= proximoAlerta && detectionManager.detectionLevel > 10)
       {
          TocarSomAoCalhas(sonsAlerta);
          proximoAlerta = Time.time + intervaloAlerta;
@@ -200,8 +204,9 @@ public class Enemy : MonoBehaviour
 
       if (!playerInVisionRadius && !playerInShootingRadius) Guard();
 
-      if (playerInVisionRadius && !playerInShootingRadius) PursuePlayer();
-      if (playerInVisionRadius && playerInShootingRadius) ShootPlayer(); 
+      if (playerInVisionRadius && detectionManager.detectionLevel < detectionManager.detectionUpperLimit) detectionManager.detectionLevel++;
+      if (playerInVisionRadius && !playerInShootingRadius && detectionManager.detectionLevel > detectionManager.detectionPursueLimit) PursuePlayer();
+     
       
       // no fim do Update()
       if (anim != null)
@@ -385,10 +390,10 @@ public class Enemy : MonoBehaviour
          // anim.SetBool("Shoot", false);
          // anim.SetBool("Die", true);
       }
-      Disparar();
-   }
-   
-   private void Disparar()
+        Disparar();
+    }
+
+    private void Disparar()
    {
       if (previouslyShoot) return;
       // a recarregar não dispara

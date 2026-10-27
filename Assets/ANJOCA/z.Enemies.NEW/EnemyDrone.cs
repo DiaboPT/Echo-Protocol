@@ -5,6 +5,8 @@ using UnityEngine.AI;
 
 public class EnemyDrone : MonoBehaviour
 {
+   private DetectionBasic detectionManager;
+
    [Header("Enemy Drone Health and Damage")] 
    public float enemyHealth = 100f;
    public float presentHealth;
@@ -83,7 +85,9 @@ public class EnemyDrone : MonoBehaviour
       
       // a linha começa escondida
       if (linhaTiro != null) linhaTiro.enabled = false;
-   }
+
+      detectionManager = transform.parent.GetComponent<DetectionBasic>();
+    }
 
    private void Update()
    {
@@ -95,9 +99,10 @@ public class EnemyDrone : MonoBehaviour
 
       if (!playerInVisionRadius && !playerInShootingRadius) Guard();
 
-      if (playerInVisionRadius && !playerInShootingRadius) PursuePlayer();
-      if (playerInVisionRadius && playerInShootingRadius) ShootPlayer(); 
-   }
+        if (playerInVisionRadius && detectionManager.detectionLevel < detectionManager.detectionUpperLimit) detectionManager.detectionLevel++;
+        if (playerInVisionRadius && !playerInShootingRadius && detectionManager.detectionLevel > detectionManager.detectionPursueLimit) PursuePlayer();
+        
+    }
 
    
 
@@ -173,34 +178,35 @@ public class EnemyDrone : MonoBehaviour
       Vector3 alvo = new Vector3(playerBody.position.x, transform.position.y, playerBody.position.z);
       VoarPara(alvo, enemySpeed);
       visionRadius = 30f;
-      // shootingRadius = 16f;
-      
-      
-      /*if (enemyAgent.SetDestination(playerBody.position))
-      {
-         // animations
-         // anim.SetBool("Walk", false);
-         // anim.SetBool("AimRun", true);
-         // anim.SetBool("Shoot", false);
-         // anim.SetBool("Die", false);
-         
-         // + vision and shooting radius
-         visionRadius = 30f;
-         shootingRadius = 16f;
-      }
-      else
-      {
-         // anim.SetBool("Walk", false);
-         // anim.SetBool("AimRun", false);
-         // anim.SetBool("Shoot", false);
-         // anim.SetBool("Die", true);
-      }*/
-      
-      Disparar();
-   }
-   
-   
-   private void Disparar()
+        // shootingRadius = 16f;
+
+
+        /*if (enemyAgent.SetDestination(playerBody.position))
+        {
+           // animations
+           // anim.SetBool("Walk", false);
+           // anim.SetBool("AimRun", true);
+           // anim.SetBool("Shoot", false);
+           // anim.SetBool("Die", false);
+
+           // + vision and shooting radius
+           visionRadius = 30f;
+           shootingRadius = 16f;
+        }
+        else
+        {
+           // anim.SetBool("Walk", false);
+           // anim.SetBool("AimRun", false);
+           // anim.SetBool("Shoot", false);
+           // anim.SetBool("Die", true);
+        }*/
+
+        Disparar();
+
+    }
+
+
+    private void Disparar()
    {
       if (previouslyShoot) return;
 
