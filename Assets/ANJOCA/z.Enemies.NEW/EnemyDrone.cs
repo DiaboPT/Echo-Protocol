@@ -6,8 +6,9 @@ using UnityEngine.AI;
 public class EnemyDrone : MonoBehaviour
 {
    [Header("Enemy Drone Health and Damage")] 
-   private float enemyHealth = 120f;
+   public float enemyHealth = 100f;
    public float presentHealth;
+   
    public float giveDamage = 3f;
    // public HealthBar healthBar;
    
@@ -219,10 +220,10 @@ public class EnemyDrone : MonoBehaviour
       }
       
       
-      // mostra a linha da ponta da arma até onde o tiro acabou
+      // mostra a linha da ponta da arma até onde o tiro acabou (só com o debug visual, F3)
       if (linhaTiro != null)
       {
-         linhaTiro.enabled = true;
+         linhaTiro.enabled = ModoDebugVisual.Tiros;
          linhaTiro.SetPosition(0, origem);
          linhaTiro.SetPosition(1, fim);
          Invoke(nameof(EsconderLinha), duracaoLinha);

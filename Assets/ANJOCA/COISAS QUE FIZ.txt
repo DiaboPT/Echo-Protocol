@@ -68,3 +68,75 @@ Modo Teste
 
 corrigido tiro pelas portas
 
+
+V 0.4
+------------------------------
+adicionadas texturas
+
+mira mais precisa com zoom
+-> apenas funciona depois de apanhar o respetivo módulo e carregar na tecla 3
+
+MINIMAPA
+-> Quando é que aparece o vermelho do inimigo no minimapa
+O inimigo vê-te: estás dentro do raio de visão dele (o Vision Radius do Inspector). Esse raio sobe para 30 m quando te persegue e para 40 m quando leva um tiro, e uma ZonaAlerta também o aumenta.
+  Estás perto: a menos de 15 m dele, mesmo que não te veja. É o Raio Perto do ícone.
+  
+adicionado um modelo de inimigo
+adicionado um modelo de arma
+animações
+ficheiro enemy alterado para as animações
+correção rotação do soldado quando dispara
+script weapon.cs alterado para headshots
+colliders enemy alterados para headshots
+trocado o tipo de shootingArea de Câmara paraobjeto simples
+efeito particle de disparo do inimigo
+efeito sonoro de disparo inimigo
+efeito sonoro do inimigo ao levar tiros
+efeito sonoro do iniimigo a morrer
+
+animação do soldado a reagir aos tiros (hit reaction)
+animação diferente ao morre de headshot
+
+
+enquanto estiver a receber tiros nao dispara logo ( enquanto reproduz a animação)
+
+Tempo Atordoado: passa a ser só o mínimo. Com 0.3 manda a animação. 
+Se puseres 0, conta só a animação. Se o puseres maior do que a animação, ele fica atordoado mais tempo do que o solavanco.
+
+mira dos inimigos imperfeita (com desvios)
+andar incrementa 2.5º+2º (4.5º)
+---------------------------------------------------------------------
+Distância	Desvio máximo (parado, 2.5°)	A andar (4.5°)
+5 m	        22 cm	                        39 cm
+10 m	    44 cm	                        79 cm
+20 m	    87 cm	                        1,57 m
+
+
+efieto sonoro quando inimigo deteta jogador
+
+recarregar de arma do inimigo
+-> animação
+-> som
+-> vozes (neste momento a vazio)
+-> etc.
+
+inimigo passa a ter balas / carregadores
+
+adicionada barra vida inimigo no modo teste
+
+adicionado efeito de sangue nos soldados inimigos
+->efeito vfx
+->alterado script weapon e enemy
+
+FOI FEITO UM MODO DEBUG (TECLA F2)
+-> desta forma é possível ter acesso a variáveis e parâmetros "on-the-fly"
+
+FOI FEITO UM MODO DEBUG VISUAL (TECLA F3)
+-> desta forma é possível visualizar trajetos, vida dos inimigos, etc. visualmente
+-> balas dos inimigos e do player passam apenas a estar visiveis através deste modo
+
+no modo teste foi adicionado
+-> power-ups são automaticamente ativados quando entro no modo
+-> quanto cada bala tira aos inimigos
+
+-> foi feito um prefab do soldado inimigo

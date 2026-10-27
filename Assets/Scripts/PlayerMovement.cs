@@ -15,6 +15,14 @@ public class PlayerMovement : MonoBehaviour
     [Header("Câmara")]
     public Transform cameraTransform; // arrastar a Main Camera
     public float mouseSensitivity = 0.1f;
+    
+    [Header("Zoom (depois de apanhar o módulo de Precisão)")]
+    public float zoomFOV = 30f;     // campo de visão com zoom (o normal é 60)
+    public float zoomSpeed = 10f;   // rapidez da transição
+    public float zoomSensitivity = 0.05f;   // sensibilidade do rato com zoom total
+
+    Camera cam;
+    float normalFOV;
 
     CharacterController controller;
     SuitAbilities abilities;
@@ -28,6 +36,12 @@ public class PlayerMovement : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        
+        if (cameraTransform != null)
+        {
+            cam = cameraTransform.GetComponent<Camera>();
+            if (cam != null) normalFOV = cam.fieldOfView;
+        }
     }
 
     void Update()
@@ -37,12 +51,28 @@ public class PlayerMovement : MonoBehaviour
         if (kb == null || mouse == null) return;
 
         // --- Olhar ---
-        Vector2 look = mouse.delta.ReadValue() * mouseSensitivity;
+        // Passa suavemente de mouseSensitivity para zoomSensitivity à medida que a câmara aproxima
+        float sensibilidade = mouseSensitivity;
+        if (cam != null)
+        {
+            float progressoZoom = Mathf.InverseLerp(normalFOV, zoomFOV, cam.fieldOfView); // 0 = normal, 1 = zoom total
+            sensibilidade = Mathf.Lerp(mouseSensitivity, zoomSensitivity, progressoZoom);
+        }
+
+        Vector2 look = mouse.delta.ReadValue() * sensibilidade;
         transform.Rotate(0f, look.x, 0f);                 // o corpo roda para os lados
         pitch = Mathf.Clamp(pitch - look.y, -85f, 85f);   // a câmara sobe/desce, com limite
         if (cameraTransform != null)
             cameraTransform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
 
+        // --- Zoom: botão direito, só depois de apanhar o módulo de Precisão e ativar no módulo na tecla 3 ---
+        if (cam != null)
+        {
+            bool aFazerZoom = abilities != null && abilities.precisionActive && mouse.rightButton.isPressed;
+            float fovAlvo = aFazerZoom ? zoomFOV : normalFOV;
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, fovAlvo, zoomSpeed * Time.deltaTime);
+        }
+        
         // --- Andar ---
         Vector3 move = Vector3.zero;
         if (kb.wKey.isPressed) move += transform.forward;

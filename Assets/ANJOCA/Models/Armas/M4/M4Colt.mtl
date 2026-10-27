@@ -1,0 +1,38 @@
+# Blender 3.4.1 MTL File: 'M4ColtV1.blend'
+# www.blender.org
+
+newmtl Base
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd D:/Entwicklung/CGTrader/M4 Colt/Texturen/V1/Blender/Base_BaseColor.png
+map_Ns D:/Entwicklung/CGTrader/M4 Colt/Texturen/V1/Blender/Base_Roughness.png
+map_refl D:/Entwicklung/CGTrader/M4 Colt/Texturen/V1/Blender/Base_Metallic.png
+map_Bump -bm 1.000000 D:/Entwicklung/CGTrader/M4 Colt/Texturen/V1/Blender/Base_Normal.png
+
+newmtl Magazin
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd D:/Entwicklung/CGTrader/M4 Colt/Texturen/V1/Blender/Magazin_BaseColor.png
+map_Ns D:/Entwicklung/CGTrader/M4 Colt/Texturen/V1/Blender/Magazin_Roughness.png
+map_refl D:/Entwicklung/CGTrader/M4 Colt/Texturen/V1/Blender/Magazin_Metallic.png
+map_Bump -bm 1.000000 D:/Entwicklung/CGTrader/M4 Colt/Texturen/V1/Blender/Magazin_Normal.png
+
+newmtl Visier
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd D:/Entwicklung/CGTrader/M4 Colt/Texturen/V1/Blender/Visier_BaseColor.png
+map_Ns D:/Entwicklung/CGTrader/M4 Colt/Texturen/V1/Blender/Visier_Roughness.png
+map_refl D:/Entwicklung/CGTrader/M4 Colt/Texturen/V1/Blender/Visier_Metallic.png
+map_Bump -bm 1.000000 D:/Entwicklung/CGTrader/M4 Colt/Texturen/V1/Blender/Visier_Normal.png
